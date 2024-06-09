@@ -1,17 +1,19 @@
 #pragma once
 
+#include <fstream>
+
+#include <non_copyable.hpp>
+
 namespace huffman {
+using byte = char;
 
-struct TreeNode {
+class Huffman : public NonCopyable {
 public:
-  TreeNode(char symbol, int weight, bool isLeaf = false);
+  Huffman();
 
 public:
-  TreeNode *left;
-  TreeNode *right;
-  char symbol;
-  int weight;
-  bool isLeaf;
+  void Encode(std::string inFile, std::string outFile);
+
+  void Decode(std::ifstream in, std::ofstream out);
 };
-
 } // namespace huffman

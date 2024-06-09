@@ -16,15 +16,16 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+include_directories(include)
+
 add_executable(
   testentry
-  test/test.cpp
+  test/symbol_tree.cpp
 )
 
-target_link_libraries(
-  testentry
-  GTest::gtest_main
-)
+add_library(huffman src/huffman.cpp src/symbol_tree.cpp include/huffman.hpp include/non_copyable.hpp test/symbol_tree.cpp)
+
+target_link_libraries(testentry GTest::gtest_main huffman)
 
 include(GoogleTest)
 gtest_discover_tests(testentry)
