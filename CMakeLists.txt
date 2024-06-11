@@ -3,6 +3,7 @@ project(huffman)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXE_LINKER_FLAGS "-Xlinker -v -v")
 
 include(FetchContent)
 FetchContent_Declare(
@@ -20,10 +21,11 @@ include_directories(include)
 
 add_executable(
   testentry
-  test/symbol_tree.cpp
+  test/test.cpp
 )
 
-add_library(huffman src/huffman.cpp src/symbol_tree.cpp include/huffman.hpp include/non_copyable.hpp test/symbol_tree.cpp)
+add_library(huffman STATIC src/huffman.cpp src/symbol_tree.cpp include/huffman.hpp include/non_copyable.hpp)
+target_compile_options(huffman PRIVATE -v)
 
 target_link_libraries(testentry GTest::gtest_main huffman)
 

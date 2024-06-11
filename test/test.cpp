@@ -1,18 +1,17 @@
-#include "huffman.hpp"
 #include <cstdint>
 #include <gtest/gtest.h>
+#include <huffman.hpp>
 #include <symbol_tree.hpp>
-#include <utility>
 
 // Demonstrate some basic assertions.
 TEST(SymbolTreeSuite, Construct) {
   std::map<huffman::byte, uint64_t> frequency = {
-      {'a', 5}, {'b', 9}, {'c', 12}, {'d', 13}, {'e', 16}, {'f', 45}};
+      {'l', 4}, {'w', 1}, {'a', 2}, {'s', 2}, {'e', 2}};
 
   std::vector<std::pair<huffman::byte, std::string>> expectedCodes = {
-      std::make_pair('a', "1100"), std::make_pair('b', "1101"),
-      std::make_pair('c', "100"),  std::make_pair('d', "101"),
-      std::make_pair('e', "111"),  std::make_pair('f', "0"),
+      std::make_pair('l', "11"),  std::make_pair('w', "100"),
+      std::make_pair('a', "101"), std::make_pair('s', "00"),
+      std::make_pair('e', "01"),
   };
 
   huffman::SymbolTree symbolTree(frequency);

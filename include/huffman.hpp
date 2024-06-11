@@ -5,7 +5,6 @@
 #include <non_copyable.hpp>
 
 namespace huffman {
-using byte = char;
 
 class Huffman : public NonCopyable {
 public:

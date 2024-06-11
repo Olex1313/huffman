@@ -1,8 +1,8 @@
 
-#include "huffman.hpp"
-#include "symbol_tree.hpp"
 #include <fstream>
+#include <huffman.hpp>
 #include <ios>
+#include <symbol_tree.hpp>
 
 namespace huffman {
 /*

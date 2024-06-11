@@ -1,4 +1,7 @@
+#pragma once
+
 namespace huffman {
+using byte = char;
 
 class NonCopyable {
 protected:
