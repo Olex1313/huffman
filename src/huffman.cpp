@@ -48,7 +48,8 @@ void Huffman::Encode(std::string inFile, std::string outFile) {
   symbolTree.Dump(ofs);
 
   std::string outByteBuff("");
-  while (ifs.get(symbol)) {
+  while (ifs) {
+    ifs.get(symbol);
     outByteBuff += symbolTree.GetCode(symbol);
     if (outByteBuff.length() >= 8) {
       std::bitset<8> bset(outByteBuff.substr(0, 8));

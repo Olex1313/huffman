@@ -7,8 +7,7 @@ std::string getTmpFile(std::string suffix = "") {
   const testing::TestInfo *const testInfo =
       testing::UnitTest::GetInstance()->current_test_info();
 
-  return testing::TempDir() + std::string(testInfo->test_suite_name()) + "." +
-         std::string(testInfo->test_case_name()) + "." + suffix;
+  return testing::TempDir() + std::to_string(std::rand()) + "." + suffix;
 }
 
 TEST(SymbolTreeSuite, Construct) {
@@ -73,9 +72,10 @@ class HuffmanEncodingTest : public testing::TestWithParam<std::string> {};
 
 TEST_P(HuffmanEncodingTest, EncodeAndDecodeTextFile) {
   const std::string testText = GetParam();
-  std::string inFileName = getTmpFile("in." + testText.substr(0, 8));
-  std::string outFileName = getTmpFile("out." + testText.substr(0, 8));
-  std::string decodedFileName = getTmpFile("decoded." + testText.substr(0, 8));
+  int testId = std::rand();
+  std::string inFileName = getTmpFile("in." + std::to_string(testId));
+  std::string outFileName = getTmpFile("out." + std::to_string(testId));
+  std::string decodedFileName = getTmpFile("decoded." + std::to_string(testId));
 
   std::ofstream inFile(inFileName);
   ASSERT_TRUE(inFile.good());
