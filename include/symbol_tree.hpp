@@ -32,14 +32,20 @@ class SymbolTree : public NonCopyable {
 public:
   SymbolTree(const std::map<byte, uint64_t> &symbolFreqMap);
 
+  SymbolTree(std::ifstream &ifs);
+
 public:
   std::string GetCode(byte symbol) const;
 
+  TreeNode *GetRoot() const;
+
+  bool HasCode(byte symbol) const;
+
   void Dump(std::ofstream &ofs) const;
 
-  void Load(std::ifstream &ifs);
-
 private:
+  void Load(std::ifstream &ifs);
+  void BuildHuffmanTree();
   void BuildCodeTable(TreeNode *node, std::string code);
 
 private:

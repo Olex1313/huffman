@@ -24,10 +24,13 @@ add_executable(
   test/test.cpp
 )
 
-add_library(huffman STATIC src/huffman.cpp src/symbol_tree.cpp include/huffman.hpp include/non_copyable.hpp)
-target_compile_options(huffman PRIVATE -v)
+add_library(huff_lib STATIC src/huffman.cpp src/symbol_tree.cpp include/huffman.hpp include/non_copyable.hpp)
+target_compile_options(huff_lib PRIVATE -v)
 
-target_link_libraries(testentry GTest::gtest_main huffman)
+target_link_libraries(testentry GTest::gtest_main huff_lib)
 
 include(GoogleTest)
 gtest_discover_tests(testentry)
+
+add_executable(huffman src/main.cpp)
+target_link_libraries(huffman huff_lib)
