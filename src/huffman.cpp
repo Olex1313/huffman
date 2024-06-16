@@ -1,4 +1,5 @@
 
+#include <bitset>
 #include <filesystem>
 #include <fstream>
 #include <huffman.hpp>
