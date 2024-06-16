@@ -1,7 +1,9 @@
 
+#include <filesystem>
 #include <fstream>
 #include <huffman.hpp>
 #include <ios>
+#include <iostream>
 #include <symbol_tree.hpp>
 
 namespace huffman {
@@ -23,6 +25,8 @@ void Huffman::Encode(std::string inFile, std::string outFile) {
   if (!ifs.is_open()) {
     throw std::runtime_error("unable to open file: " + inFile);
   }
+  std::filesystem::path p(inFile);
+  std::cout << std::filesystem::file_size(p) << std::endl;
 
   byte symbol;
   std::map<byte, uint64_t> symbolFreqMap;
@@ -39,16 +43,26 @@ void Huffman::Encode(std::string inFile, std::string outFile) {
     throw std::runtime_error("unable to open file: " + outFile);
   }
 
+  long headerSize = symbolTree.GetCompressedHeaderBytes();
   symbolTree.Dump(ofs);
+
+  std::string outByteBuff("");
   while (ifs.get(symbol)) {
-    std::string code = symbolTree.GetCode(symbol);
-    for (char c : code) {
-      ofs.write(&c, 1);
+    outByteBuff += symbolTree.GetCode(symbol);
+    if (outByteBuff.length() >= 8) {
+      std::bitset<8> bset(outByteBuff.substr(0, 8));
+      outByteBuff.erase(0, 8);
+      ofs.write((const char *)&bset, 1);
     }
   }
-
   ofs.close();
   ifs.close();
+
+  std::filesystem::path o(outFile);
+  long outFileSize = std::filesystem::file_size(o);
+
+  std::cout << outFileSize - headerSize << std::endl;
+  std::cout << headerSize << std::endl;
 }
 
 void Huffman::Decode(std::string sourceFileName, std::string destFileName) {
@@ -64,24 +78,39 @@ void Huffman::Decode(std::string sourceFileName, std::string destFileName) {
   }
 
   byte symbol;
+  unsigned char mask = 0x80;
+  unsigned char code = 0;
   TreeNode *curNode = symbolTree.GetRoot();
 
-  while (ifs.get(symbol)) {
-    if (curNode == nullptr) {
-      throw std::runtime_error(
-          "decode failed, probably due to corrupted symbol sequence");
-    }
+  uintmax_t totalBytes = symbolTree.GetTotalCodedBits() / 8;
+  unsigned char extraBits = symbolTree.GetTotalCodedBits() % 8;
 
-    if (symbol == '0') {
-      curNode = curNode->left.get();
-    } else {
-      curNode = curNode->right.get();
-    }
+  for (uintmax_t i = 0; i < totalBytes; i++) {
+    ifs.get(symbol);
 
-    if (curNode->IsLeaf()) {
-      char c = curNode->symbol;
-      ofs.write((const char *)&c, sizeof(c));
-      curNode = symbolTree.GetRoot();
+    for (unsigned char offset = 0; offset < 8; offset++) {
+      code = (symbol & mask) ? 1 : 0;
+      curNode = (code) ? curNode->right.get() : curNode->left.get();
+      if (curNode->IsLeaf()) {
+        char c = curNode->symbol;
+        ofs.write((const char *)&c, 1);
+        curNode = symbolTree.GetRoot();
+      }
+      symbol = symbol << 1;
+    }
+  }
+
+  if (extraBits > 0) {
+    ifs.get(symbol);
+    for (unsigned char offset = 0; offset < extraBits; offset++) {
+      code = (symbol & mask) ? 1 : 0;
+      curNode = (code) ? curNode->right.get() : curNode->left.get();
+      if (curNode->IsLeaf()) {
+        char c = curNode->symbol;
+        ofs.write((const char *)&c, 1);
+        curNode = symbolTree.GetRoot();
+      }
+      symbol = symbol << 1;
     }
   }
 

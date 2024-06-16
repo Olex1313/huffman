@@ -54,27 +54,32 @@ TEST(SymbolTreeSuite, DumpShouldRestoreToSameTableOnLoad) {
   }
 }
 
-TEST(Huffman, EncodeAndDecodeTextFile) {
-  // test data
-  const std::string loremIpsum =
-      "Lorem ipsum dolor sit amet, "
-      "consectetur adipiscing elit, sed do eiusmod tempor incididunt ut "
-      "labore et"
-      " dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
-      "exercitation ullamco"
-      " laboris nisi ut aliquip ex ea commodo consequat. Duis aute "
-      "irure dolor in reprehenderit in voluptate velit esse cillum "
-      "dolore eu fugiat nulla pariatur. Excepteur sint occaecat "
-      "cupidatat non proident, sunt in culpa qui officia deserunt "
-      "mollit anim id est laborum.";
+const std::string loremIpsum =
+    "Lorem ipsum dolor sit amet, "
+    "consectetur adipiscing elit, sed do eiusmod tempor incididunt ut "
+    "labore et"
+    " dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
+    "exercitation ullamco"
+    " laboris nisi ut aliquip ex ea commodo consequat. Duis aute "
+    "irure dolor in reprehenderit in voluptate velit esse cillum "
+    "dolore eu fugiat nulla pariatur. Excepteur sint occaecat "
+    "cupidatat non proident, sunt in culpa qui officia deserunt "
+    "mollit anim id est laborum.";
 
-  // prepare files
-  std::string inFileName = getTmpFile("in");
-  std::string outFileName = getTmpFile("out");
-  std::string decodedFileName = getTmpFile("decoded");
+const std::string simpleAbba = "abbapeppa";
+const std::string nonAscii = "хаффман";
+
+class HuffmanEncodingTest : public testing::TestWithParam<std::string> {};
+
+TEST_P(HuffmanEncodingTest, EncodeAndDecodeTextFile) {
+  const std::string testText = GetParam();
+  std::string inFileName = getTmpFile("in." + testText.substr(0, 8));
+  std::string outFileName = getTmpFile("out." + testText.substr(0, 8));
+  std::string decodedFileName = getTmpFile("decoded." + testText.substr(0, 8));
 
   std::ofstream inFile(inFileName);
-  inFile << loremIpsum;
+  ASSERT_TRUE(inFile.good());
+  inFile << testText;
   inFile.close();
 
   huffman::Huffman huffman;
@@ -90,7 +95,10 @@ TEST(Huffman, EncodeAndDecodeTextFile) {
   while (input >> sstr.rdbuf())
     ;
 
-  std::string decodedLoremIpsum = sstr.str();
+  std::string decodedTxt = sstr.str();
 
-  ASSERT_EQ(loremIpsum, decodedLoremIpsum);
+  ASSERT_EQ(testText, decodedTxt);
 }
+
+INSTANTIATE_TEST_SUITE_P(Huffman, HuffmanEncodingTest,
+                         testing::Values(loremIpsum, simpleAbba, nonAscii));

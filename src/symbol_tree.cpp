@@ -108,6 +108,20 @@ void SymbolTree::Dump(std::ofstream &ofs) const {
   }
 }
 
+uintmax_t SymbolTree::GetCompressedHeaderBytes() const {
+  uint8_t alphabetSize = alphabet.size();
+  return sizeof(FILETAG) + sizeof(uint8_t) + sizeof(uintmax_t) +
+         (sizeof(char) + sizeof(int)) * alphabetSize;
+}
+
+uintmax_t SymbolTree::GetTotalCodedBits() const {
+  uintmax_t totalbits = 0;
+  for (const auto &[symbol, weight] : alphabet) {
+    totalbits += weight * prefixCodes.at(symbol).length();
+  }
+  return totalbits;
+}
+
 void SymbolTree::Load(std::ifstream &ifs) {
   if (!ifs.is_open()) {
     throw std::runtime_error("unable to open file");

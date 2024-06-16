@@ -44,6 +44,10 @@ public:
 
   void Dump(std::ofstream &ofs) const;
 
+  uintmax_t GetCompressedHeaderBytes() const;
+
+  uintmax_t GetTotalCodedBits() const;
+
 private:
   void Load(std::ifstream &ifs);
   void BuildHuffmanTree();
