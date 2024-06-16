@@ -3,6 +3,7 @@
 #include "non_copyable.hpp"
 #include <fstream>
 #include <map>
+#include <memory>
 #include <string>
 
 namespace huffman {
