@@ -34,6 +34,6 @@ int main(int argc, char const *argv[]) {
   if (encodingFlag) {
     huff.Encode(inFile, outFile);
   } else {
-    huff.Encode(inFile, outFile);
+    huff.Decode(inFile, outFile);
   }
 }
