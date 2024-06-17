@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 namespace huffman {
-using byte = std::uint8_t;
+using byte = uint8_t;
 
 class NonCopyable {
 protected:
