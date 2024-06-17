@@ -29,7 +29,7 @@ void Huffman::Encode(std::string inFile, std::string outFile) {
   std::filesystem::path p(inFile);
   std::cout << std::filesystem::file_size(p) << std::endl;
 
-  byte symbol;
+  char symbol;
   std::map<byte, uint64_t> symbolFreqMap;
   while (ifs.get(symbol)) {
     symbolFreqMap[symbol]++;
@@ -89,7 +89,7 @@ void Huffman::Decode(std::string sourceFileName, std::string destFileName) {
     throw std::runtime_error("unable to open file: " + destFileName);
   }
 
-  byte symbol;
+  char symbol;
   unsigned char mask = 0x80;
   unsigned char code = 0;
   TreeNode *curNode = symbolTree.GetRoot();
