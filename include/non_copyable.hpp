@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 namespace huffman {
 using byte = std::uint8_t;
