@@ -57,6 +57,16 @@ void Huffman::Encode(std::string inFile, std::string outFile) {
       ofs.write((const char *)&bset, 1);
     }
   }
+
+  // NOTE should flush buffer, due to non-half byte remaining
+  if (outByteBuff.length() > 0) {
+      for (size_t i = outByteBuff.length(); i < 8; i++) {
+          outByteBuff += "0";
+      }
+      std::bitset<8> bset(outByteBuff.substr(0, 8));
+      ofs.write((const char*)&bset, 1);
+  }
+
   ofs.close();
   ifs.close();
 
