@@ -22,16 +22,18 @@ Second pass:
 - end
 */
 void Huffman::Encode(std::string inFile, std::string outFile) {
+  uintmax_t outSize = 0;
+  uintmax_t inSize = 0;
   std::ifstream ifs(inFile, std::ios::binary);
   if (!ifs.is_open()) {
     throw std::runtime_error("unable to open file: " + inFile);
   }
   std::filesystem::path p(inFile);
-  std::cout << std::filesystem::file_size(p) << std::endl;
 
   char symbol;
   std::map<byte, uint64_t> symbolFreqMap;
   while (ifs.get(symbol)) {
+    inSize++;
     symbolFreqMap[symbol]++;
   }
   ifs.clear(); // due to reuse of file stream
@@ -55,25 +57,25 @@ void Huffman::Encode(std::string inFile, std::string outFile) {
       std::bitset<8> bset(outByteBuff.substr(0, 8));
       outByteBuff.erase(0, 8);
       ofs.write((const char *)&bset, 1);
+      outSize++;
     }
   }
 
   // NOTE should flush buffer, due to non-half byte remaining
   if (outByteBuff.length() > 0) {
-      for (size_t i = outByteBuff.length(); i < 8; i++) {
-          outByteBuff += "0";
-      }
-      std::bitset<8> bset(outByteBuff.substr(0, 8));
-      ofs.write((const char*)&bset, 1);
+    for (size_t i = outByteBuff.length(); i < 8; i++) {
+      outByteBuff += "0";
+    }
+    std::bitset<8> bset(outByteBuff.substr(0, 8));
+    ofs.write((const char *)&bset, 1);
+    outSize++;
   }
 
   ofs.close();
   ifs.close();
 
-  std::filesystem::path o(outFile);
-  long outFileSize = std::filesystem::file_size(o);
-
-  std::cout << outFileSize - headerSize << std::endl;
+  std::cout << inSize << std::endl;
+  std::cout << outSize << std::endl;
   std::cout << headerSize << std::endl;
 }
 
@@ -89,6 +91,9 @@ void Huffman::Decode(std::string sourceFileName, std::string destFileName) {
     throw std::runtime_error("unable to open file: " + destFileName);
   }
 
+  uintmax_t inSize = 0;
+  uintmax_t outSize = 0;
+
   char symbol;
   unsigned char mask = 0x80;
   unsigned char code = 0;
@@ -99,6 +104,7 @@ void Huffman::Decode(std::string sourceFileName, std::string destFileName) {
 
   for (uintmax_t i = 0; i < totalBytes; i++) {
     ifs.get(symbol);
+    inSize++;
 
     for (unsigned char offset = 0; offset < 8; offset++) {
       code = (symbol & mask) ? 1 : 0;
@@ -106,6 +112,7 @@ void Huffman::Decode(std::string sourceFileName, std::string destFileName) {
       if (curNode->IsLeaf()) {
         char c = curNode->symbol;
         ofs.write((const char *)&c, 1);
+        outSize++;
         curNode = symbolTree.GetRoot();
       }
       symbol = symbol << 1;
@@ -114,20 +121,27 @@ void Huffman::Decode(std::string sourceFileName, std::string destFileName) {
 
   if (extraBits > 0) {
     ifs.get(symbol);
+    inSize++;
     for (unsigned char offset = 0; offset < extraBits; offset++) {
       code = (symbol & mask) ? 1 : 0;
       curNode = (code) ? curNode->right.get() : curNode->left.get();
       if (curNode->IsLeaf()) {
         char c = curNode->symbol;
         ofs.write((const char *)&c, 1);
+        outSize++;
         curNode = symbolTree.GetRoot();
       }
       symbol = symbol << 1;
     }
   }
+  inSize++; // for null symbol
 
   ifs.close();
   ofs.close();
+
+  std::cout << inSize << std::endl;
+  std::cout << outSize << std::endl;
+  std::cout << symbolTree.GetCompressedHeaderBytes() << std::endl;
 }
 
 }; // namespace huffman

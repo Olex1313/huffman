@@ -62,6 +62,9 @@ const std::string loremIpsum =
     "cupidatat non proident, sunt in culpa qui officia deserunt "
     "mollit anim id est laborum.";
 
+const std::string frenchBon =
+    "Съешь же ещё этих мягких французских булок да выпей чаю.";
+
 const std::string simpleAbba = "abbapeppa";
 const std::string nonAscii = "хаффман";
 
@@ -98,4 +101,5 @@ TEST_P(HuffmanEncodingTest, EncodeAndDecodeTextFile) {
 }
 
 INSTANTIATE_TEST_SUITE_P(Huffman, HuffmanEncodingTest,
-                         testing::Values(loremIpsum, simpleAbba, nonAscii));
+                         testing::Values(loremIpsum, simpleAbba, nonAscii,
+                                         frenchBon));
