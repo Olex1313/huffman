@@ -1,7 +1,7 @@
 #pragma once
 
 namespace huffman {
-using byte = uint8_t;
+using byte = std::uint8_t;
 
 class NonCopyable {
 protected:

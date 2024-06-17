@@ -4,9 +4,6 @@
 #include <symbol_tree.hpp>
 
 std::string getTmpFile(std::string suffix = "") {
-  const testing::TestInfo *const testInfo =
-      testing::UnitTest::GetInstance()->current_test_info();
-
   return testing::TempDir() + std::to_string(std::rand()) + "." + suffix;
 }
 
